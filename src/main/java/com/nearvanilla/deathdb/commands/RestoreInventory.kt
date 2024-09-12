@@ -1,26 +1,27 @@
 /* Licensed under GNU General Public License v3.0 */
 package com.nearvanilla.deathdb.commands
 
-import cloud.commandframework.annotations.Argument
-import cloud.commandframework.annotations.CommandDescription
-import cloud.commandframework.annotations.CommandMethod
-import cloud.commandframework.annotations.CommandPermission
-import cloud.commandframework.annotations.processing.CommandContainer
 import com.nearvanilla.deathdb.DeathDB
 import com.nearvanilla.deathdb.libs.Serialization
+import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.CommandDescription
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.annotations.processing.CommandContainer
 
 @CommandContainer
 class RestoreInventory {
     @CommandDescription("Restores the inventory of a given player.")
-    @CommandMethod("restoreinventory|ri <player_name> <index>")
-    @CommandPermission("deathdb.restoreinventory")
+    @Command("restoreinventory|ri <player_name> <index>")
+    @Permission("deathdb.restoreinventory")
     @Suppress("unused")
-    fun restoreInventoryCommand(sender: CommandSender, @Argument("player_name") playerName: String, @Argument("index") index: Int) {
+    fun restoreInventoryCommand(sourceStack: CommandSourceStack, @Argument(value = "player_name") playerName: String?, @Argument(value = "index") index: Int) {
+        val sender: CommandSender = sourceStack.sender
         // If sender is not player.
         if (sender !is Player) {
             val noPlayerMsg = Component.text("This command can only be ran by players.")
@@ -28,29 +29,23 @@ class RestoreInventory {
             return
         }
         val player: Player = sender
-        val targetPlayer = DeathDB.pluginInstance.server.getOfflinePlayer(playerName)
-        // If target is offline.
-        if (!targetPlayer.isOnline) {
-            val playerOfflineMsg = Component.text(
-                "This player is offline.",
-                NamedTextColor.RED,
-                TextDecoration.BOLD,
-            )
-            player.sendMessage(playerOfflineMsg)
+        if (playerName == null) {
+            val noPlayerMsg = Component.text("Please provide a player name.")
+            player.sendMessage(noPlayerMsg)
             return
         }
-        // If target has never played before.
-        if (!targetPlayer.hasPlayedBefore()) {
-            val neverPlayedMsg = Component.text(
-                "This player has never played on this server before.",
+        val targetPlayer = DeathDB.pluginInstance.server.getOfflinePlayer(playerName).player
+        // If target is offline.
+        if (targetPlayer == null) {
+            val cantFindPlayerMessage = Component.text(
+                "Can't find that player, are they online?",
                 NamedTextColor.RED,
-                TextDecoration.BOLD,
             )
-            player.sendMessage(neverPlayedMsg)
+            player.sendMessage(cantFindPlayerMessage)
             return
         }
         // Restore Inventory.
-        val results = DeathDB.dbWrapper.getPlayerInformation(targetPlayer as Player)
+        val results = DeathDB.dbWrapper.getPlayerInformation(targetPlayer)
         var resultIndex = 1
         var serializedInventory: String? = null
         while (results.next()) {
@@ -64,7 +59,6 @@ class RestoreInventory {
             val noInventoryMsg = Component.text(
                 "No inventory found.",
                 NamedTextColor.RED,
-                TextDecoration.BOLD,
             )
             player.sendMessage(noInventoryMsg)
             return
@@ -74,7 +68,6 @@ class RestoreInventory {
             val invalidPlayerMsg = Component.text(
                 "Failed to find the player.",
                 NamedTextColor.RED,
-                TextDecoration.BOLD,
             )
             player.sendMessage(invalidPlayerMsg)
             return
@@ -91,7 +84,6 @@ class RestoreInventory {
         val successMsg = Component.text(
             "Successfully restored inventory.",
             NamedTextColor.GREEN,
-            TextDecoration.BOLD,
         )
         player.sendMessage(successMsg)
         return

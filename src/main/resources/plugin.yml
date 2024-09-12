@@ -1,15 +1,7 @@
 name: DeathDB
 version: '1.0'
 main: com.nearvanilla.deathdb.DeathDB
-api-version: 1.20
+api-version: 1.21
 prefix: DeathDB
 authors: [ 105hua ]
 description: A simple plugin that allows for logging and manipulating the data of player deaths.
-# I don't think this is needed anymore, due to cloud implementation.
-#commands:
-#  showdeaths:
-#    description: Show the information of up to 5 of the most recent deaths of a player.
-#    permission: deathdb.showdeaths
-#  restoreinventory:
-#    description: Restore the inventory of a player, this should only be used after executing the showdeaths command.
-#    permission: deathdb.restoreinventory

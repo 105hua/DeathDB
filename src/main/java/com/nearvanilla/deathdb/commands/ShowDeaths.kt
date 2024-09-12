@@ -1,18 +1,18 @@
 /* Licensed under GNU General Public License v3.0 */
 package com.nearvanilla.deathdb.commands
 
-import cloud.commandframework.annotations.Argument
-import cloud.commandframework.annotations.CommandDescription
-import cloud.commandframework.annotations.CommandMethod
-import cloud.commandframework.annotations.CommandPermission
-import cloud.commandframework.annotations.processing.CommandContainer
 import com.nearvanilla.deathdb.DeathDB
+import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.CommandDescription
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.annotations.processing.CommandContainer
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -21,10 +21,11 @@ import java.time.format.DateTimeFormatter
 @CommandContainer
 class ShowDeaths {
     @CommandDescription("Show the most recent deaths of a player.")
-    @CommandPermission("deathdb.showdeaths")
-    @CommandMethod("showdeaths|sd <player_name>")
+    @Command("showdeaths|sd <player_name>")
+    @Permission("deathdb.showdeaths")
     @Suppress("unused")
-    fun showDeathsCommand(sender: CommandSender, @Argument("player_name") playerName: String) {
+    fun showDeathsCommand(sourceStack: CommandSourceStack, @Argument(value = "player_name") playerName: String) {
+        val sender: CommandSender = sourceStack.sender
         if (sender !is Player) {
             val noPlayerMsg = Component.text("This command can only be ran by players.")
             sender.sendMessage(noPlayerMsg)
@@ -36,7 +37,6 @@ class ShowDeaths {
             val neverPlayedMsg = Component.text(
                 "This player has never been on this server before.",
                 NamedTextColor.RED,
-                TextDecoration.BOLD,
             )
             player.sendMessage(neverPlayedMsg)
             return
@@ -45,7 +45,6 @@ class ShowDeaths {
             var deathListMsg = Component.text(
                 "List of Deaths\n===============\n",
                 NamedTextColor.GRAY,
-                TextDecoration.BOLD,
             )
             var index = 1
             while (results.next()) {
@@ -60,7 +59,6 @@ class ShowDeaths {
                 val entryComponent = Component.text(
                     "$index) $formattedDateTime | $formattedPosition\n",
                     NamedTextColor.GRAY,
-                    TextDecoration.BOLD,
                 )
                 index += 1
                 deathListMsg = deathListMsg.append(entryComponent)

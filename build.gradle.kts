@@ -1,8 +1,9 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.22"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("com.diffplug.spotless") version "6.23.3"
+    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("com.gradleup.shadow") version "8.3.1"
+    id("com.diffplug.spotless") version "7.0.0.BETA2"
+    id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "com.nearvanilla"
@@ -22,14 +23,14 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("cloud.commandframework", "cloud-paper", "1.8.4")
-    implementation("cloud.commandframework:cloud-annotations:1.8.4")
-    annotationProcessor("cloud.commandframework:cloud-annotations:1.8.4")
+    implementation("org.incendo:cloud-paper:2.0.0-beta.10")
+    implementation("org.incendo:cloud-annotations:2.0.0")
+    annotationProcessor("org.incendo:cloud-annotations:2.0.0")
 }
 
-val targetJavaVersion = 17
+val targetJavaVersion = 21
 
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
@@ -64,6 +65,11 @@ tasks.shadowJar{
 
 tasks.build{
     dependsOn("shadowJar")
+}
+
+tasks.runServer{
+    minecraftVersion("1.21.1")
+    jvmArgs("-Dcom.mojang.eula.agree=true")
 }
 
 spotless {
