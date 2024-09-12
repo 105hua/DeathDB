@@ -46,5 +46,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: plugin
+          name: plugin-${{ matrix.os }}
           path: build/libs/DeathDB-1.0-SNAPSHOT.jar
