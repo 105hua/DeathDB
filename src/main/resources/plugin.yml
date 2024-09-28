@@ -5,3 +5,4 @@ api-version: 1.21
 prefix: DeathDB
 authors: [ 105hua ]
 description: A simple plugin that allows for logging and manipulating the data of player deaths.
+folia-supported: true

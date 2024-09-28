@@ -48,6 +48,7 @@ class ShowDeaths {
             )
             var index = 1
             while (results.next()) {
+                DeathDB.pluginLogger.info("Death record found.")
                 val dateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(results.getInt("timeOfDeath").toLong()), ZoneId.systemDefault())
                 val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy @ HH:mm")
                 val formattedDateTime = dateTime.format(formatter)

@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.0.20"
-    id("com.gradleup.shadow") version "8.3.1"
+    id("com.gradleup.shadow") version "8.3.2"
     id("com.diffplug.spotless") version "7.0.0.BETA2"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
@@ -28,6 +28,7 @@ dependencies {
     implementation("org.incendo:cloud-paper:2.0.0-beta.10")
     implementation("org.incendo:cloud-annotations:2.0.0")
     annotationProcessor("org.incendo:cloud-annotations:2.0.0")
+    implementation("com.zaxxer:HikariCP:6.0.0")
 }
 
 val targetJavaVersion = 21
