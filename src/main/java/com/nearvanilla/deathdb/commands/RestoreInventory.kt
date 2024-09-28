@@ -2,12 +2,12 @@
 package com.nearvanilla.deathdb.commands
 
 import com.nearvanilla.deathdb.DeathDB
-import com.nearvanilla.deathdb.libs.Serialization
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.CommandDescription
@@ -44,43 +44,23 @@ class RestoreInventory {
             player.sendMessage(cantFindPlayerMessage)
             return
         }
-        // Restore Inventory.
-        val results = DeathDB.dbWrapper.getPlayerInformation(targetPlayer)
-        var resultIndex = 1
-        var serializedInventory: String? = null
-        while (results.next()) {
-            if (resultIndex == index) {
-                serializedInventory = results.getString("serializedInventory")
-                break
-            }
-            resultIndex += 1
-        }
-        if (serializedInventory == null) {
-            val noInventoryMsg = Component.text(
-                "No inventory found.",
+        // Get the inventory to restore.
+        val inventoryToRestore = DeathDB.dbWrapper.getInventoryFromRecord(targetPlayer, index)
+        if (inventoryToRestore == null) {
+            val noInventoryMessage = Component.text(
+                "No inventory found for that index.",
                 NamedTextColor.RED,
             )
-            player.sendMessage(noInventoryMsg)
+            player.sendMessage(noInventoryMessage)
             return
         }
-        val targetOnlinePlayer = targetPlayer.player
-        if (targetOnlinePlayer == null) {
-            val invalidPlayerMsg = Component.text(
-                "Failed to find the player.",
-                NamedTextColor.RED,
-            )
-            player.sendMessage(invalidPlayerMsg)
-            return
-        }
-        val deserializedInventory = Serialization.deserialize(serializedInventory)
-        val currentInventory = targetOnlinePlayer.inventory.contents
-        targetOnlinePlayer.inventory.clear()
-        for (item in currentInventory) {
+        // Drop the current inventory.
+        targetPlayer.inventory.contents.forEach { item: ItemStack? ->
             if (item != null) {
-                targetOnlinePlayer.world.dropItem(targetOnlinePlayer.location, item)
+                targetPlayer.world.dropItem(targetPlayer.location, item)
             }
         }
-        targetOnlinePlayer.inventory.contents = deserializedInventory
+        targetPlayer.inventory.contents = inventoryToRestore
         val successMsg = Component.text(
             "Successfully restored inventory.",
             NamedTextColor.GREEN,

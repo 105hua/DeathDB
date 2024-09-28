@@ -13,10 +13,6 @@ import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.CommandDescription
 import org.incendo.cloud.annotations.Permission
 import org.incendo.cloud.annotations.processing.CommandContainer
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @CommandContainer
 class ShowDeaths {
@@ -41,28 +37,13 @@ class ShowDeaths {
             player.sendMessage(neverPlayedMsg)
             return
         } else {
-            val results = DeathDB.dbWrapper.getPlayerInformation(targetPlayer as Player)
+            val deathRecords = DeathDB.dbWrapper.getPlayerInformation(targetPlayer as Player)
             var deathListMsg = Component.text(
                 "List of Deaths\n===============\n",
                 NamedTextColor.GRAY,
             )
-            var index = 1
-            while (results.next()) {
-                DeathDB.pluginLogger.info("Death record found.")
-                val dateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(results.getInt("timeOfDeath").toLong()), ZoneId.systemDefault())
-                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy @ HH:mm")
-                val formattedDateTime = dateTime.format(formatter)
-                val posX = String.format("%.3f", results.getDouble("posX"))
-                val posY = String.format("%.3f", results.getDouble("posY"))
-                val posZ = String.format("%.3f", results.getDouble("posZ"))
-                val formattedPosition = "$posX, $posY, $posZ"
-                // TODO Make clickable button to go to inventory.
-                val entryComponent = Component.text(
-                    "$index) $formattedDateTime | $formattedPosition\n",
-                    NamedTextColor.GRAY,
-                )
-                index += 1
-                deathListMsg = deathListMsg.append(entryComponent)
+            for (deathRecord in deathRecords) {
+                deathListMsg = deathListMsg.append(deathRecord)
             }
             player.sendMessage(deathListMsg)
             return
