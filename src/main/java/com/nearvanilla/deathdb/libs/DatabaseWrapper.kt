@@ -53,7 +53,7 @@ class DatabaseWrapper(dbPath: String) {
         val databaseConnection = hikariDataSource.connection
         DeathDB.pluginLogger.info("Getting player information for ${player.name}")
         DeathDB.pluginLogger.info("Unique ID: ${player.uniqueId}")
-        val getPlayerInfoStmt = databaseConnection.prepareStatement("SELECT * FROM deaths WHERE uniqueId = ? ORDER BY timeOfDeath DESC LIMIT 5") ?: throw DeathDBException("Failed to prepare the get player info statement.")
+        val getPlayerInfoStmt = databaseConnection.prepareStatement("SELECT * FROM deaths WHERE uniqueId = ? ORDER BY timeOfDeath DESC LIMIT 10") ?: throw DeathDBException("Failed to prepare the get player info statement.")
         getPlayerInfoStmt.setString(1, player.uniqueId.toString())
         val results = getPlayerInfoStmt.executeQuery() // Returns HikariProxyResultSet, which is a ResultSet
         val deathList = mutableListOf<TextComponent>()
