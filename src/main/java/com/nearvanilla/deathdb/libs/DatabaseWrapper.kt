@@ -85,7 +85,7 @@ class DatabaseWrapper(dbPath: String) {
     fun getInventoryFromRecord(player: Player, index: Int): Array<ItemStack>? {
         val databaseConnection = hikariDataSource.connection
         val getInventoryStmt = databaseConnection.prepareStatement(
-            "SELECT serializedInventory FROM deaths WHERE uniqueId = ? ORDER BY timeOfDeath DESC LIMIT 5",
+            "SELECT serializedInventory FROM deaths WHERE uniqueId = ? ORDER BY timeOfDeath DESC LIMIT 10",
         ) ?: throw DeathDBException("Failed to prepare the get inventory statement.")
         getInventoryStmt.setString(1, player.uniqueId.toString())
         val results = getInventoryStmt.executeQuery()
